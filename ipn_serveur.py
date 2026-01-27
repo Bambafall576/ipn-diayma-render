@@ -11,7 +11,7 @@ payments = {}
 
 @app.route("/", methods=["GET"])
 def home():
-    return "IPN SERVER DIAYMA OK", 200
+    return "IPN SERVER DIAYMA OK - test 2", 200
 
 
 @app.route("/ipn", methods=["POST"])
@@ -64,3 +64,4 @@ def status(transaction_id):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
+
