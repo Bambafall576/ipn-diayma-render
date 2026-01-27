@@ -11,7 +11,7 @@ def log_request():
 
 @app.route("/", methods=["GET"])
 def home():
-    return "IPN SERVER DIAYMA OK", 200
+    return "test 4 : IPN SERVER DIAYMA OK", 200
 
 payments = {}
 
@@ -36,3 +36,4 @@ def status(payment_id):
         "payment_id": payment_id,
         "status": payments.get(payment_id, "PENDING")
     })
+
