@@ -23,12 +23,12 @@ def ipn():
     logging.info(f"📦 DATA : {data}")
     ###
     try:
-    product_list = data["products"][0]   # liste de paires
-    product_dict = dict(product_list)    # conversion en dict
-    payment_id = product_dict["id"]
+        product_list = data["products"][0]   # liste de paires
+        product_dict = dict(product_list)    # conversion en dict
+        payment_id = product_dict["id"]
     except Exception as e:
-    logging.error(f"❌ Mauvais format IPN : {e}")
-    return jsonify({"error": "bad format"}), 400
+        logging.error(f"❌ Mauvais format IPN : {e}")
+        return jsonify({"error": "bad format"}), 400
 
     ###
     """
@@ -52,6 +52,7 @@ def status(payment_id):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
