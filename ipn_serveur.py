@@ -1,67 +1,38 @@
-#test 2
 from flask import Flask, request, jsonify
-from datetime import datetime
-import os
-import json
+import logging
 
 app = Flask(__name__)
 
-IPN_TOKEN = "SECRET_IPN_DIAYMA"
-payments = {}
+logging.basicConfig(level=logging.INFO)
+
+@app.before_request
+def log_request():
+    logging.info(f"➡️ {request.method} {request.path}")
 
 @app.route("/", methods=["GET"])
 def home():
-    return "IPN SERVER DIAYMA OK - test 2", 200
+    return "IPN SERVER DIAYMA OK", 200
 
+payments = {}
 
 @app.route("/ipn", methods=["POST"])
 def ipn():
+    logging.info("🔥 IPN REÇUE")
     data = request.json
-    print("\n🔔 IPN REÇUE 🔔")
-    print(json.dumps(data, indent=2))
+    logging.info(f"📦 DATA : {data}")
 
-    if data.get("token") != IPN_TOKEN:
-        return jsonify({"error": "unauthorized"}), 401
+    try:
+        payment_id = data["products"][0][0]["id"]
+    except Exception as e:
+        logging.error("❌ Mauvais format IPN")
+        return jsonify({"error": "bad format"}), 400
 
-    # 🔎 extraction robuste du transaction_id
-    transaction_id = None
-    products = data.get("products")
-
-    if isinstance(products, list) and len(products) > 0:
-        first = products[0]
-
-        if isinstance(first, dict):
-            transaction_id = first.get("id")
-        elif isinstance(first, list):
-            for item in first:
-                if isinstance(item, dict) and "id" in item:
-                    transaction_id = item["id"]
-                    break
-
-    if not transaction_id:
-        print("❌ transaction_id introuvable")
-        return jsonify({"error": "transaction_id missing"}), 400
-
-    payments[transaction_id] = {
-        "status": "SUCCESS",
-        "amount": data.get("total"),
-        "currency": data.get("devise"),
-        "received_at": datetime.utcnow().isoformat()
-    }
-
-    print(f"✅ Paiement confirmé : {transaction_id}")
+    payments[payment_id] = "SUCCESS"
     return jsonify({"status": "ok"}), 200
 
-
-@app.route("/status/<transaction_id>", methods=["GET"])
-def status(transaction_id):
-    if transaction_id not in payments:
-        return jsonify({"status": "PENDING"}), 200
-
-    return jsonify(payments[transaction_id]), 200
-
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
-
+@app.route("/status/<payment_id>", methods=["GET"])
+def status(payment_id):
+    return jsonify({
+        "payment_id": payment_id,
+        "status": payments.get(payment_id, "PENDING")
+    })
