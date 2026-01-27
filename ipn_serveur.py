@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request, jsonify
 import logging
 
@@ -11,7 +12,7 @@ def log_request():
 
 @app.route("/", methods=["GET"])
 def home():
-    return "test 5 : IPN SERVER DIAYMA OK", 200
+    return "test 6 : IPN SERVER DIAYMA OK", 200
 
 payments = {}
 
@@ -36,5 +37,9 @@ def status(payment_id):
         "payment_id": payment_id,
         "status": payments.get(payment_id, "PENDING")
     })
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
 
 
