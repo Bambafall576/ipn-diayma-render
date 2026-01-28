@@ -6,6 +6,20 @@ logging.basicConfig(level=logging.INFO)
 
 payments = {}  # transaction_id -> dict(status, amount)
 
+#payments = {}  # transaction_id → status
+
+@app.route("/cancel", methods=["GET"])
+def cancel():
+    transaction_id = request.args.get("transaction_id")
+
+    if transaction_id:
+        payments[transaction_id] = {
+            "status": "FAILED"
+        }
+        print(f"❌ Paiement {transaction_id} annulé")
+
+    return "Paiement annulé", 200
+
 @app.route("/ipn", methods=["POST"])
 def ipn():
     data = request.json
@@ -25,14 +39,22 @@ def ipn():
 
 @app.route("/status/<transaction_id>", methods=["GET"])
 def status(transaction_id):
+    if transaction_id in payments:
+        return payments[transaction_id], 200
+    return {"status": "PENDING"}, 200
+
+"""
+@app.route("/status/<transaction_id>", methods=["GET"])
+def status(transaction_id):
     info = payments.get(transaction_id)
     if not info:
         return jsonify({"status": "PENDING"}), 200
     return jsonify(info), 200
-
+"""
 @app.route("/", methods=["GET"])
 def home():
     return "IPN Server Render OK", 200
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
+
