@@ -41,7 +41,7 @@ def ipn():
 def status(transaction_id):
     if transaction_id in payments:
         return payments[transaction_id], 200
-    return {"status": "PENDING"}, 200
+    return {"status": "PAIEMENT EN COURS"}, 200#return {"status": "PENDING"}, 200
 
 """
 @app.route("/status/<transaction_id>", methods=["GET"])
@@ -57,4 +57,5 @@ def home():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
+
 
